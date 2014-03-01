@@ -1,0 +1,13 @@
+{
+    "name": "connect-allow",
+    "private": true,
+    "description": "",
+    "main": "./index",
+    "version": "0.0.1",
+    "devDependencies": {
+        "mocha": "~1.14.0"
+    },
+    "scripts": {
+        "test": "node_modules/mocha/bin/mocha"
+    }
+}

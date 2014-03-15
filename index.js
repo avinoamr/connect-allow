@@ -10,7 +10,7 @@ module.exports = function( fn ) {
         // this method will first verify that the request is indeed allowed
         // to access these actions using the req.allowed()
         res.allow = function( actions ) {
-            res.setHeader( "Allow", actions.filter( req.allowed ).join( ", " ) );
+            res.setHeader( "Allow", actions.filter( req.allowed ).join( "," ) );
         }
         next()
     }

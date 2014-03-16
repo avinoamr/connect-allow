@@ -12,6 +12,18 @@ module.exports = function( fn ) {
         res.allow = function( actions ) {
             res.setHeader( "Allow", actions.filter( req.allowed ).join( "," ) );
         }
+
+        // negates req.allowed, but also sets the response to 405 Not Allowed
+        req.denied = function( action, others ) {
+            if ( others ) res.allow( others ); // first notify the response of the other allowed actions
+            if ( !req.allowed( action ) ) {
+                res.writeHead( 405, "Not Allowed" );
+                res.write( "Not Allowed" );
+                res.end();
+                return true;
+            }
+            return false
+        }
         next()
     }
 };

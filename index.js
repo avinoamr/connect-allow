@@ -1,29 +1,30 @@
-module.exports = function( fn ) {
+module.exports = function( methods, fn ) {
+    if ( !Array.isArray( methods ) ) {
+        fn = methods
+        methods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
+    }
+
     return function( req, res, next ) {
-
-        // check if a given action string is allowed for this request
-        req.allowed = function( action ) {
-            return fn( req, action );
-        }
-
-        // set the response Allow header to the given list of actions
-        // this method will first verify that the request is indeed allowed
-        // to access these actions using the req.allowed()
-        res.allow = function( actions ) {
-            res.setHeader( "Allow", actions.filter( req.allowed ).join( "," ) );
-        }
-
-        // negates req.allowed, but also sets the response to 405 Not Allowed
-        req.denied = function( action, others ) {
-            if ( others ) res.allow( others ); // first notify the response of the other allowed actions
-            if ( !req.allowed( action ) ) {
-                res.writeHead( 405, "Not Allowed" );
-                res.write( "Not Allowed" );
-                res.end();
-                return true;
+        var method, m, deny = false, allowed = [];
+        if ( fn ) req.allowed = fn;
+        if ( !req.allowed ) req.allowed = function() { return false };
+        for ( m = 0 ; m < methods.length ; m += 1 ) {
+            method = methods[ m ];
+            if ( req.allowed( req.originalUrl, method ) ) {
+                allowed.push( method )
+            } else if ( method == req.method ) {
+                deny = true
             }
-            return false
         }
+
+        res.setHeader( "Allow", allowed.join( "," ) );
+        if ( deny ) {
+            res.writeHead( 405, "Not Allowed" );
+            res.write( "Not Allowed" );
+            res.end();
+            return
+        }
+
         next()
     }
 };

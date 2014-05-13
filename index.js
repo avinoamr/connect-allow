@@ -1,9 +1,5 @@
-module.exports = function( methods, fn ) {
-    if ( !Array.isArray( methods ) ) {
-        fn = methods
-        methods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
-    }
-
+var methods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ];
+module.exports = function( fn ) {
     return function( req, res, next ) {
         var method, m, deny = false, allowed = [];
         if ( fn ) req.allowed = fn;
